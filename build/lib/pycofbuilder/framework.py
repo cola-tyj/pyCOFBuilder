@@ -108,46 +108,80 @@ class Framework():
     def __init__(self, name: str = None, **kwargs):
 
         self.name: str = name
+        #name 是一个可选参数，用于指定框架的名称。
 
         self.out_path: str = kwargs.get('out_dir', os.path.join(os.getcwd(), 'out'))
+        # 输出目录的路径，默认存储在当前工作目录下的out文件夹
         self.save_bb: bool = kwargs.get('save_bb', True)
+        # 决定是否保存 building blocks 构建块，默认为True
         self.bb_out_path: str = kwargs.get('bb_out_path', os.path.join(self.out_path, 'building_blocks'))
+        # 是保存构建块的路径
 
         self.logger = create_logger(level=kwargs.get('log_level', 'info'),
                                     format=kwargs.get('log_format', 'simple'),
                                     save_to_file=kwargs.get('save_to_file', False),
                                     log_filename=kwargs.get('log_filename', 'pycofbuilder.log'))
+        # 初始化日志记录器，记录框架的各种操作和信息
 
+# frame的几何和物理属性
         self.symm_tol = kwargs.get('symm_tol', 0.1)
+        # 对称性容差，用于处理框架的对称性
         self.angle_tol = kwargs.get('angle_tol', 0.5)
+        # 角度容差，调整框架中原子和化学键之间的角度
         self.dist_threshold = kwargs.get('dist_threshold', 0.8)
+        # 距离阈值，筛选原子间是否存在有效的相互作用
         self.bond_threshold = kwargs.get('bond_threshold', 1.3)
-
-        self.bb1_name = None
+        # 化学键的距离阈值
+    
+# frame的基本结构属性
+        self.bb1_name = None    
         self.bb2_name = None
         self.topology = None
+        # 框架的拓扑结构
         self.stacking = None
+        # 框架的堆叠类型
         self.smiles = None
+        # 存储SMILES字符串，表示分子的化学结构
 
         self.atom_types = []
+        # 存储原子的类型（C H O
         self.atom_pos = []
+        # 原子的空间坐标 position
         self.atom_labels = []
+        # 原子的标签或名称
+# 晶胞矩阵和晶胞参数
         self.cellMatrix = np.eye(3)
+        # cellMatrix 是3x3的单位矩阵
         self.cellParameters = np.array([1, 1, 1, 90, 90, 90]).astype(float)
+        # 是一个包含晶胞参数的数组，包括晶胞的三个边长和三个角度
         self.bonds = []
+        # 化学键 bond
 
+# 晶体学相关属性
         self.lattice_sgs = None
+        # 晶格对称群
         self.space_group = None
+        # 晶体的空间群信息
         self.space_group_n = None
+        # 空间群的编号 num
 
+# frame的其他物理属性
         self.dimention = None
+        # 维度 2D or 3D
         self.n_atoms = self.get_n_atoms()
+        # 框架中的原子数量
         self.mass = None
+        # frame 质量
         self.composition = None
+        # 组成
         self.charge = 0
+        # 电荷，默认为0
         self.multiplicity = 1
+        # frame的多重性（自旋多重性）
         self.chirality = False
+        # frame是否具备手性（手对称
 
+# 可用的拓扑结构和堆叠类型
         self.available_2D_top = ['HCB', 'HCB_A',
                                  'SQL', 'SQL_A',
                                  'KGD',
@@ -157,6 +191,7 @@ class Framework():
         # To add: ['dia', 'bor', 'srs', 'pts', 'ctn', 'rra', 'fcc', 'lon', 'stp', 'acs', 'tbo', 'bcu', 'fjh', 'ceq']
         self.available_3D_top = ['DIA', 'DIA_A', 'BOR']  # Temporary
         self.available_topologies = self.available_2D_top + self.available_3D_top
+        # 所支持的拓扑结构类型
 
         # Define available stackings for all 2D topologies
         self.available_stacking = {
@@ -165,6 +200,7 @@ class Framework():
             'SQL': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
             'SQL_A': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
             'KGD': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
+            'HXL': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
             'HXL_A': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
             'FXT': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
             'FXT_A': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
@@ -172,22 +208,28 @@ class Framework():
             'DIA_A': [str(i + 1) for i in range(15)],
             'BOR': [str(i + 1) for i in range(15)]
         }
+        # 所支持的堆叠类型
 
         if self.name is not None:
             self.from_name(self.name)
+        # 根据框架名称加载相应数据
 
+# 用于返回对象的“用户友好”字符串表示，易于理解的
     def __str__(self) -> str:
         return self.as_string()
 
+# 返回对象的“开发者友好”的字符串表示，目的是提供一个尽可能明确和详细的对象描述，方便调试和开发。
     def __repr__(self) -> str:
         return f'Framework({self.bb1_name}, {self.bb2_name}, {self.topology}, {self.stacking})'
 
+# 用于生成一个详细的框架信息字符串。
     def as_string(self) -> str:
         """
         Returns a string with the Framework information.
         """
 
         fram_str = f'Name: {self.name}\n'
+        # 框架名称
 
         # Get the formula of the framework
 
@@ -197,12 +239,14 @@ class Framework():
         else:
             fram_str += 'Full Formula ()\n'
             fram_str += 'Reduced Formula: \n'
+        # 若有 self.composition，则显示完整的化学式，否则显示空
 
         fram_str += 'abc   :  {:11.6f}  {:11.6f}  {:11.6f}\n'.format(*self.cellParameters[:3])
         fram_str += 'angles:  {:11.6f}  {:11.6f}  {:11.6f}\n'.format(*self.cellParameters[3:])
         fram_str += 'A: {:11.6f}  {:11.6f}   {:11.6f}\n'.format(*self.cellMatrix[0])
         fram_str += 'B: {:11.6f}  {:11.6f}   {:11.6f}\n'.format(*self.cellMatrix[1])
         fram_str += 'C: {:11.6f}  {:11.6f}   {:11.6f}\n'.format(*self.cellMatrix[2])
+        # 格式化输出frame的晶胞参数（3个边长和3个角度）以及晶胞的晶胞矩阵
 
         fram_str += f'Cartesian Sites ({self.n_atoms})\n'
         fram_str += '  #  Type         a         b         c    label\n'
@@ -216,14 +260,17 @@ class Framework():
                                                                                   self.atom_pos[i][2],
                                                                                   self.atom_labels[i])
 
+        # 输出frame中每个原子的1类型、位置（abc坐标）和标签
         return fram_str
 
+# 返回frame中单元格内原子数量，单元格只单位晶胞 unitary cell
     def get_n_atoms(self) -> int:
         """
         Returns the number of atoms in the unitary cell
         """
         return len(self.atom_types)
 
+# 返回支持的拓扑结构列表，可以根据维度进行筛选
     def get_available_topologies(self, dimensionality: str = 'all', print_result: bool = True):
         """
         Get the available topologies implemented in the class.
@@ -266,18 +313,20 @@ class Framework():
 
         return dimensionality_list
 
+# 检查frame的名称是否符合正确的格式，并返回一个元组，包含构建块名称、网格类型和堆叠方式
     def check_name_concistency(self, FrameworkName) -> tuple[str, str, str, str]:
         """
         Checks if the name is in the correct format and returns a
         tuple with the building blocks names, the net and the stacking.
 
         In case the name is not in the correct format, an error is raised.
+        如果名字不是正确格式，则会报错
 
         Parameters
         ----------
         FrameworkName : str, required
             The name of the COF to be created
-
+        框架名称，必须是一个字符串。格式为构建块1-构建块2-网格类型-堆叠方式：BB1-BB2-Net-Stacking
         Returns
         -------
         tuple[str, str, str, str]
@@ -286,20 +335,26 @@ class Framework():
 
         string_error = 'FrameworkName must be a string'
         assert isinstance(FrameworkName, str), string_error
+        # 首先验证是否为字符串
 
         name_error = 'FrameworkName must be in the format: BB1-BB2-Net-Stacking'
         assert len(FrameworkName.split('-')) == 4, name_error
+        # 检查是否包含由‘-’分割的4个部分
 
         bb1_name, bb2_name, Net, Stacking = FrameworkName.split('-')
+        # 将Name进行分解
 
         net_error = f'{Net} not in the available list: {self.available_topologies}'
         assert Net in self.available_topologies, net_error
+        # 检查Net是否在可用的拓扑列表：self.available_topologies中
 
         stacking_error = f'{Stacking} not in the available list: {self.available_stacking[Net]}'
         assert Stacking in self.available_stacking[Net], stacking_error
+        # 检查Stacking是否在对应拓扑的堆叠类型列表中
 
         return bb1_name, bb2_name, Net, Stacking
 
+# 根据frame的名称创建一个新的 COF
     def from_name(self, FrameworkName, **kwargs) -> None:
         """Creates a COF from a given FrameworkName.
 
@@ -314,12 +369,16 @@ class Framework():
             The COF object
         """
         bb1_name, bb2_name, Net, Stacking = self.check_name_concistency(FrameworkName)
+        # 调用方法验证并解析框架名称
 
         bb1 = BuildingBlock(name=bb1_name, bb_out_path=self.bb_out_path, save_bb=self.save_bb)
         bb2 = BuildingBlock(name=bb2_name, bb_out_path=self.bb_out_path, save_bb=self.save_bb)
+        # 创建两个 Building Block 对象，表示frame的两个构建块
 
         self.from_building_blocks(bb1, bb2, Net, Stacking, **kwargs)
+        # 调用方法根据这些构建块和拓扑信息构建COF
 
+# 根据给定的构建块和网络类型、堆叠方式创建COF结构
     def from_building_blocks(self,
                              bb1: BuildingBlock,
                              bb2: BuildingBlock,
@@ -355,6 +414,7 @@ class Framework():
             self.smiles = f'{bb1.smiles}.{bb2.smiles}'
         else:
             print('WARNING: The smiles attribute is not available for the building blocks')
+        # 检查bb1 和 bb2 对象是否具有smile属性，如果有则将信息合并并存储为框架的smile属性
 
         net_build_dict = {
             'HCB': self.create_hcb_structure,
@@ -362,7 +422,7 @@ class Framework():
             'SQL': self.create_sql_structure,
             'SQL_A': self.create_sql_a_structure,
             'KGD': self.create_kgd_structure,
-            # 'HXL': self.create_hxl_structure,
+            'HXL': self.create_hxl_structure,
             'HXL_A': self.create_hxl_a_structure,
             'FXT': self.create_fxt_structure,
             'FXT_A': self.create_fxt_a_structure,
@@ -370,6 +430,7 @@ class Framework():
             'DIA_A': self.create_dia_a_structure,
             'BOR': self.create_bor_structure
             }
+        # 根据 net 选择合适的函数来创建具体的结构（通过net_build_dict字典映射
 
         result = net_build_dict[net](bb1, bb2, stacking, **kwargs)
 
@@ -385,33 +446,41 @@ class Framework():
 
         return result
 
+# 将 frame结构保存为指定格式文件，如 cif,xyz,json等
     def save(self,
              fmt: str = 'cif',
              supercell: list = (1, 1, 1),
              save_dir=None,
              primitive=False,
              save_bonds=True) -> None:
+            #  save_bonds：是否保存化学键
+        
         """
         Save the structure in a specif file format.
 
         Parameters
         ----------
         fmt : str, optional
+        # fmt：文件格式，默认为cif
             The file format to be saved
             Can be `json`, `cif`, `xyz`, `turbomole`, `vasp`, `xsf`, `pdb`, `pqr`, `qe`.
             Default: 'cif'
         supercell : list, optional
+        # 列表，指定保存结构时的supercell大小
             The supercell to be used to save the structure.
             Default: [1,1,1]
         save_dir : str, optional
+        # 保存文件的路径
             The path to save the structure. By default, the structure is saved in a
             `out` folder created in the current directory.
         primitive : bool, optional
+        # 如果为True，保存原始晶胞，否则保存常规晶胞
             If True, the primitive cell is saved. Otherwise, the conventional cell is saved.
             Default: False
         """
 
         save_dict = {
+            # 使用字典映射文件格式到具体的保存函数
             'cjson': save_chemjson,
             'cif': save_cif,
             'xyz': save_xyz,
@@ -429,9 +498,11 @@ class Framework():
 
         if primitive:
             structure = self.prim_structure
+            # 保存原始结构
 
         else:
             structure = Structure(
+                # 使用frame的cellMatrix等信息创建结构
                 self.cellMatrix,
                 self.atom_types,
                 self.atom_pos,
@@ -440,6 +511,7 @@ class Framework():
             )
 
         structure.make_supercell(supercell)
+        # 生成supercell（超胞
 
         if save_bonds:
             bonds = get_bonds(structure, self.bond_threshold)
@@ -474,6 +546,7 @@ class Framework():
                    min_atoms=None,
                    max_atoms=None,
                    angle_tolerance=1e-3):
+        # 将frame的晶胞转换为一个立方体supercell。该方法会调整frame的晶胞，使其成为一个包含至少min_length长度立方体，并满足原子数限制
         """
         Transform the primitive structure into a supercell with alpha, beta, and
         gamma equal to 90 degrees. The algorithm will iteratively increase the size
@@ -484,18 +557,26 @@ class Framework():
         ----------
         min_length : float, optional
             Minimum length of the cubic cell (default is 10)
+        # supercell的最小边长，默认为10
         force_diagonal : bool, optional
             If True, generate a transformation with a diagonal transformation matrix (default is False)
+        # 是否强制使用对角矩阵进行转换
         force_90_degrees : bool, optional
             If True, force the angles to be 90 degrees (default is True)
+        # 是否强制所有角度为90度
         min_atoms : int, optional
             Minimum number of atoms in the supercell (default is None)
+        # csupercell中的最小原子数
         max_atoms : int, optional
             Maximum number of atoms in the supercell (default is None)
+        # 最大原子数
         angle_tolerance : float, optional
             The angle tolerance for the transformation (default is 1e-3)
+        # 角度公差，默认为1e-3
         """
 
+        # 使用CubicSupercellTransformation类将原始结构转换为一个立方体supercell，
+        # 且根据指定条件（最小边长、原子数）等进行调整
         cubic_dict = CubicSupercellTransformation(
             min_length=min_length,
             force_90_degrees=force_90_degrees,
@@ -505,9 +586,11 @@ class Framework():
             angle_tolerance=angle_tolerance
             ).apply_transformation(self.prim_structure).as_dict()
 
+        # 更新frame的晶胞矩阵和晶胞参数
         self.cellMatrix = np.array(cubic_dict['lattice']['matrix']).astype(float)
         self.cellParameters = cell_to_cellpar(self.cellMatrix)
 
+        # 更新frame的原子类型、坐标和标签
         self.atom_types = [i['label'] for i in cubic_dict['sites']]
         self.atom_pos = [i['xyz'] for i in cubic_dict['sites']]
         self.atom_labels = [i['properties']['source'] for i in cubic_dict['sites']]
@@ -521,6 +604,13 @@ class Framework():
                              slab: float = 10.0,
                              shift_vector: list = (1.0, 1.0, 0),
                              tilt_angle: float = 5.0):
+        # 用于创建一个具有HCB网络（蜂窝网络）的共价有机框架，这种网络由两个三脚型（tripodal）
+        # 构建块（BB_T_A和 BB_T_B）组成，并支持多种层间堆叠模式（如AA，AB，ABC等）
+        # 该方法主要完成以下任务：
+        # 1.验证构建块的连通性是否为3
+        # 2.计算晶胞参数，并生成晶格结构
+        # 3.根据堆叠模式排列构建块
+        # 4.返回frame的晶体学和对称性信息
         """Creates a COF with HCB network.
 
         The HCB net is composed of two tripodal building blocks.
@@ -531,14 +621,19 @@ class Framework():
             The BuildingBlock object of the tripodal Buiding Block A
         BB_T3_2 : BuildingBlock, required
             The BuildingBlock object of the tripodal Buiding Block B
+        # 分别是两个三脚型构建块,包含了构建块的原子类型,原子位置和连通性等信息.
         stacking : str, optional
             The stacking pattern of the COF layers (default is 'AA')
+        # 决定了COF层的堆叠方式,堆叠方式包括:A,AA:简单平移叠层;AB1,AB2:二层交错;ABC1，ABC2，三层交错；AAl，AAt：平移和倾斜变体。
         slab : float, optional
             Default parameter for the interlayer slab (default is 10.0)
+        # 控制层间的默认间距。
         shift_vector: list, optional
             Shift vector for the AAl and AAt stakings (defatult is [1.0,1.0,0])
+        # 平移向量，用于AAl和AAt的堆叠模式
         tilt_angle: float, optional
             Tilt angle for the AAt staking in degrees (default is 5.0)
+        # 倾斜角度，用于AAt的堆叠模式
 
         Returns
         -------
@@ -554,6 +649,7 @@ class Framework():
 
         connectivity_error = 'Building block {} must present connectivity {} not {}'
 
+        # 检查构建块的连通性是否为3，如果不是就抛出错误
         if BB_T3_A.connectivity != 3:
             self.logger.error(connectivity_error.format('A', 3, BB_T3_A.connectivity))
             raise BBConnectivityError(3, BB_T3_A.connectivity)
@@ -561,6 +657,7 @@ class Framework():
             self.logger.error(connectivity_error.format('B', 3, BB_T3_B.connectivity))
             raise BBConnectivityError(3, BB_T3_B.connectivity)
 
+        # 初始化框架属性
         self.name = f'{BB_T3_A.name}-{BB_T3_B.name}-HCB-{stacking}'
         self.topology = 'HCB'
         self.staking = stacking
@@ -585,8 +682,10 @@ class Framework():
         BB_T3_A.remove_X()
         BB_T3_B.remove_X()
 
+# 计算晶胞参数
         # Get the topology information
         topology_info = TOPOLOGY_DICT[self.topology]
+        # 从拓扑信息中获得HCB网络的基本信息
 
         # Measure the base size of the building blocks
         size = BB_T3_A.size[0] + BB_T3_B.size[0]
@@ -597,6 +696,7 @@ class Framework():
 
         delta_max = max([delta_a, delta_b])
 
+        # 根据构建块的大小（size）和位置，计算frame的晶胞边长（a,b,c）和角度（alpha,beta,gamma）
         # Calculate the cell parameters
         a = topology_info['a'] * size
         b = topology_info['b'] * size
@@ -607,16 +707,20 @@ class Framework():
 
         if self.stacking == 'A':
             c = slab
+        # 如果堆叠模式是A，就将c设置为slab的值
 
+# 创建晶格
         # Create the lattice
         self.cellMatrix = Lattice.from_parameters(a, b, c, alpha, beta, gamma)
         self.cellParameters = np.array([a, b, c, alpha, beta, gamma]).astype(float)
 
+# 创建structure
         # Create the structure
         self.atom_types = []
         self.atom_labels = []
         self.atom_pos = []
 
+# 添加构建块到structure
         # Add the A1 building blocks to the structure
         vertice_data = topology_info['vertices'][0]
         self.atom_types += BB_T3_A.atom_types
@@ -874,6 +978,7 @@ class Framework():
         self.n_atoms = len(dict_structure['sites'])
         self.composition = stacked_structure.formula
 
+# 检查原子间的距离
         dist_matrix = StartingFramework.distance_matrix
 
         # Check if there are any atoms closer than 0.8 A
@@ -882,6 +987,7 @@ class Framework():
                 if dist_matrix[i][j] < self.dist_threshold:
                     raise BondLenghError(i, j, dist_matrix[i][j], self.dist_threshold)
 
+# 计算对称性信息
         # Get the simmetry information of the generated structure
         symm = SpacegroupAnalyzer(stacked_structure,
                                   symprec=self.symm_tol,
@@ -4557,6 +4663,384 @@ class Framework():
             symm_op = symm.get_point_group_operations()
             self.hall = symm.get_hall()
 
+        except Exception as e:
+            self.logger.exception(e)
+
+            self.lattice_type = 'Triclinic'
+            self.space_group = 'P1'
+            self.space_group_n = '1'
+
+            symm_op = [1]
+            self.hall = 'P 1'
+
+        symm_text = get_framework_symm_text(self.name,
+                                            str(self.lattice_type),
+                                            str(self.hall[0:2]),
+                                            str(self.space_group),
+                                            str(self.space_group_n),
+                                            len(symm_op))
+
+        self.logger.info(symm_text)
+
+        return [self.name,
+                str(self.lattice_type),
+                str(self.hall[0:2]),
+                str(self.space_group),
+                str(self.space_group_n),
+                len(symm_op)]
+
+
+    def create_hxl_structure(self,
+                             BB_H6_A:str,
+                             BB_H6_B:str,
+                             stacking: str = 'AA',
+                             print_result: bool = True,
+                             slab: float = 10.0,
+                             shift_vector: list = (1.0, 1.0, 0),
+                             tilt_angle: float = 5.0):
+        connectivity_error = 'Building block {} must present connectivity {} not {}'
+        if BB_H6_A.connectivity != 6:
+            self.logger.error(connectivity_error.format('A', 6, BB_H6_A.connectivity))
+            raise BBConnectivityError(6, BB_H6_A.connectivity)
+        if BB_H6_B.connectivity != 6:
+            self.logger.error(connectivity_error.format('B', 6, BB_H6_B.connectivity))
+            raise BBConnectivityError(6, BB_H6_B.connectivity)
+
+        self.name = f'{BB_H6_A.name}-{BB_H6_B.name}-HXL-{stacking}'
+        self.topology = 'HXL'
+        self.staking = stacking
+        self.dimension = 2
+
+        self.charge = BB_H6_A.charge + BB_H6_B.charge
+        self.chirality = BB_H6_A.chirality or BB_H6_B.chirality
+
+        self.logger.debug(f'Starting the creation of {self.name}')
+
+        # Detect the bond atom from the connection groups type
+        bond_atom = get_bond_atom(BB_H6_A.conector, BB_H6_B.conector)
+
+        self.logger.debug('{} detected as bond atom for groups {} and {}'.format(bond_atom,
+                                                                                 BB_H6_A.conector,
+                                                                                 BB_H6_B.conector))
+
+        # Replace "X" the building block
+        BB_H6_A.replace_X(bond_atom)
+
+        # Remove the "X" atoms from the the building block
+        BB_H6_A.remove_X()
+        BB_H6_B.remove_X()
+
+        # Get the topology information
+        topology_info = TOPOLOGY_DICT[self.topology]
+
+        # Measure the base size of the building blocks
+        size = BB_H6_A.size[0] + BB_H6_B.size[0]
+
+        # Calculate the delta size to add to the c parameter
+        delta_a = abs(max(np.transpose(BB_H6_A.atom_pos)[2])) + abs(min(np.transpose(BB_H6_A.atom_pos)[2]))
+        delta_b = abs(max(np.transpose(BB_H6_B.atom_pos)[2])) + abs(min(np.transpose(BB_H6_B.atom_pos)[2]))
+
+        delta_max = max([delta_a, delta_b])
+
+        # Calculate the cell parameters
+        a = topology_info['a'] * size
+        b = topology_info['b'] * size
+        c = topology_info['c'] + delta_max
+        alpha = topology_info['alpha']
+        beta = topology_info['beta']
+        gamma = topology_info['gamma']
+
+        if self.stacking == 'A':
+            c = slab
+
+        # Create the lattice
+        self.cellMatrix = Lattice.from_parameters(a, b, c, alpha, beta, gamma)
+        self.cellParameters = np.array([a, b, c, alpha, beta, gamma]).astype(float)
+
+        # Create the structure
+        self.atom_types = []
+        self.atom_labels = []
+        self.atom_pos = []
+
+        # Add the A1 building blocks to the structure
+        vertice_data = topology_info['vertices'][0]
+        self.atom_types += BB_H6_A.atom_types
+        vertice_pos = np.array(vertice_data['position'])*a
+
+        R_Matrix = R.from_euler('z',
+                                vertice_data['angle'],
+                                degrees=True).as_matrix()
+
+        rotated_pos = np.dot(BB_H6_A.atom_pos, R_Matrix) + vertice_pos
+        self.atom_pos += rotated_pos.tolist()
+
+        self.atom_labels += ['C1' if i == 'C' else i for i in BB_H6_A.atom_labels]
+
+        # Add the A2 building block to the structure
+        vertice_data = topology_info['vertices'][1]
+        self.atom_types += BB_H6_B.atom_types
+        vertice_pos = np.array(vertice_data['position'])*a
+
+            R_Matrix = R.from_euler('z',
+                                    edge_data['angle'],
+                                    degrees=True).as_matrix()
+
+            rotated_pos = np.dot(BB_H6_B.atom_pos, R_Matrix) + edge_pos
+            self.atom_pos += rotated_pos.tolist()
+
+            self.atom_labels += ['C2' if i == 'C' else i for i in BB_H6_B.atom_labels]
+
+        StartingFramework = Structure(
+            self.cellMatrix,
+            self.atom_types,
+            self.atom_pos,
+            coords_are_cartesian=True,
+            site_properties={'source': self.atom_labels}
+        ).get_sorted_structure()
+
+        # Translates the structure to the center of the cell
+        StartingFramework.translate_sites(
+            range(len(StartingFramework.as_dict()['sites'])),
+            [0, 0, 0.5],
+            frac_coords=True,
+            to_unit_cell=True
+        )
+
+        dict_structure = StartingFramework.as_dict()
+
+        self.cellMatrix = np.array(dict_structure['lattice']['matrix']).astype(float)
+
+        self.atom_types = [i['label'] for i in dict_structure['sites']]
+        self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
+        self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
+
+        if stacking == 'A' or stacking == 'AA':
+            stacked_structure = StartingFramework
+
+        if stacking == 'AB1':
+            self.cellMatrix *= (1, 1, 2)
+            self.cellParameters *= (1, 1, 2, 1, 1, 1)
+
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types))
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels))
+
+            stacked_structure = Structure(
+                self.cellMatrix,
+                self.atom_types,
+                self.atom_pos,
+                coords_are_cartesian=True,
+                site_properties={'source': self.atom_labels}
+            )
+
+            # Get the index of the atoms in the second sheet
+            B_list = np.split(np.arange(len(self.atom_types)), 2)[1]
+
+            # Translate the second sheet by the vector [2/3, 1/3, 0.5] to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                [2/3, 1/3, 0.5],
+                frac_coords=True,
+                to_unit_cell=True
+                )
+
+        if stacking == 'AB2':
+            self.cellMatrix *= (1, 1, 2)
+            self.cellParameters *= (1, 1, 2, 1, 1, 1)
+
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types))
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels))
+
+            stacked_structure = Structure(
+                self.cellMatrix,
+                self.atom_types,
+                self.atom_pos,
+                coords_are_cartesian=True,
+                site_properties={'source': self.atom_labels}
+            )
+
+            # Get the index of the atoms in the second sheet
+            B_list = np.split(np.arange(len(self.atom_types)), 2)[1]
+
+            # Translate the second sheet by the vector [1/2, 0, 0.5] to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                [1/2, 0, 0.5],
+                frac_coords=True,
+                to_unit_cell=True
+                )
+
+        if stacking == 'ABC1':
+            self.cellMatrix *= (1, 1, 3)
+            self.cellParameters *= (1, 1, 3, 1, 1, 1)
+
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types, self.atom_types))
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos, self.atom_pos))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels, self.atom_labels))
+
+            stacked_structure = Structure(
+                self.cellMatrix,
+                self.atom_types,
+                self.atom_pos,
+                coords_are_cartesian=True,
+                site_properties={'source': self.atom_labels}
+            )
+
+            # Get the index of the atoms in the second sheet
+            _, B_list, C_list = np.split(np.arange(len(self.atom_types)), 3)
+
+            # Translate the second sheet by the vector (2/3, 1/3, 0) to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                (2/3, 1/3, 1/3),
+                frac_coords=True,
+                to_unit_cell=True
+                )
+
+            # Translate the third sheet by the vector (2/3, 1/3, 0) to generate the B positions
+            stacked_structure.translate_sites(
+                C_list,
+                (4/3, 2/3, 2/3),
+                frac_coords=True,
+                to_unit_cell=True
+            )
+
+        if stacking == 'ABC2':
+            self.cellMatrix *= (1, 1, 3)
+            self.cellParameters *= (1, 1, 3, 1, 1, 1)
+
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types, self.atom_types))
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos, self.atom_pos))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels, self.atom_labels))
+
+            stacked_structure = Structure(
+                self.cellMatrix,
+                self.atom_types,
+                self.atom_pos,
+                coords_are_cartesian=True,
+                site_properties={'source': self.atom_labels}
+            )
+
+            # Get the index of the atoms in the second sheet
+            _, B_list, C_list = np.split(np.arange(len(self.atom_types)), 3)
+
+            # Translate the second sheet by the vector (2/3, 1/3, 0) to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                (1/3, 0, 1/3),
+                frac_coords=True,
+                to_unit_cell=True
+                )
+
+            # Translate the third sheet by the vector (2/3, 1/3, 0) to generate the B positions
+            stacked_structure.translate_sites(
+                C_list,
+                (2/3, 0, 2/3),
+                frac_coords=True,
+                to_unit_cell=True
+            )
+
+        if stacking == 'AAl':
+            self.cellMatrix *= (1, 1, 2)
+            self.cellParameters *= (1, 1, 2, 1, 1, 1)
+
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types))
+            sv = np.array(shift_vector)
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos + sv))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels))
+
+            stacked_structure = Structure(
+                self.cellMatrix,
+                self.atom_types,
+                self.atom_pos,
+                coords_are_cartesian=True,
+                site_properties={'source': self.atom_labels}
+            )
+
+            # Get the index of the atoms in the second sheet
+            B_list = np.split(np.arange(len(self.atom_types)), 2)[1]
+
+            # Translate the second sheet by the vector [2/3, 1/3, 0.5] to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                [0, 0, 0.5],
+                frac_coords=True,
+                to_unit_cell=True
+                )
+
+        # Create AA tilted stacking.
+        if stacking == 'AAt':
+            cell = StartingFramework.as_dict()['lattice']
+
+            # Shift the cell by the tilt angle
+            a_cell = cell['a']
+            b_cell = cell['b']
+            c_cell = cell['c'] * 2
+            alpha = cell['alpha'] - tilt_angle
+            beta = cell['beta'] - tilt_angle
+            gamma = cell['gamma']
+
+            self.cellMatrix = cellpar_to_cell([a_cell, b_cell, c_cell, alpha, beta, gamma])
+            self.cellParameters = np.array([a_cell, b_cell, c_cell, alpha, beta, gamma]).astype(float)
+
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types))
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels))
+
+            stacked_structure = Structure(
+                self.cellMatrix,
+                self.atom_types,
+                self.atom_pos,
+                coords_are_cartesian=True,
+                site_properties={'source': self.atom_labels}
+            )
+
+            # Get the index of the atoms in the second sheet
+            B_list = np.split(np.arange(len(self.atom_types)), 2)[1]
+
+            # Translate the second sheet by the vector [2/3, 1/3, 0.5] to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                [0, 0, 0.5],
+                frac_coords=True,
+                to_unit_cell=True
+                )
+
+        dict_structure = stacked_structure.as_dict()
+
+        self.cellMatrix = np.array(dict_structure['lattice']['matrix']).astype(float)
+
+        self.atom_types = [i['label'] for i in dict_structure['sites']]
+        self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
+        self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
+        self.n_atoms = len(dict_structure['sites'])
+        self.composition = stacked_structure.formula
+
+        dist_matrix = stacked_structure.distance_matrix
+
+        # Check if there are any atoms closer than 0.8 A
+        for i in range(len(dist_matrix)):
+            for j in range(i+1, len(dist_matrix)):
+                if dist_matrix[i][j] < self.dist_threshold:
+                    raise BondLenghError(i, j, dist_matrix[i][j], self.dist_threshold)
+
+        # Get the simmetry information of the generated structure
+        symm = SpacegroupAnalyzer(stacked_structure,
+                                  symprec=self.symm_tol,
+                                  angle_tolerance=self.angle_tol)
+
+        try:
+            self.prim_structure = symm.get_refined_structure(keep_site_properties=True)
+
+            self.logger.debug(self.prim_structure)
+
+            self.lattice_type = symm.get_lattice_type()
+            self.space_group = symm.get_space_group_symbol()
+            self.space_group_n = symm.get_space_group_number()
+
+            symm_op = symm.get_point_group_operations()
+            self.hall = symm.get_hall()
         except Exception as e:
             self.logger.exception(e)
 
