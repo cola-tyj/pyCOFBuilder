@@ -95,6 +95,21 @@ TOPOLOGY_DICT = {
             {'position': [0.5, np.sqrt(3)/6, 0], 'angle': 0}
             ]
         },
+    'HXL': {
+        'a': 2,
+        'b': 2,
+        'c': 3.6,
+        'alpha': 90,
+        'beta': 90,
+        'gamma': 120,
+        'vertice_connectivity': 6,
+        'edge_connectivity': 0,
+        'vertices': [
+            {'position': [0, 0, 0], 'angle': 30},
+            {'position': [1, 1/2, 0], 'angle': 30},
+            ],
+        'edges': []
+    },
     'HXL_A': {
         'a': 2,
         'b': 2,

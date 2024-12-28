@@ -4781,14 +4781,14 @@ class Framework():
         self.atom_types += BB_H6_B.atom_types
         vertice_pos = np.array(vertice_data['position'])*a
 
-            R_Matrix = R.from_euler('z',
-                                    edge_data['angle'],
-                                    degrees=True).as_matrix()
+        R_Matrix = R.from_euler('z',
+                                vertice_data['angle'],
+                                degrees=True).as_matrix()
 
-            rotated_pos = np.dot(BB_H6_B.atom_pos, R_Matrix) + edge_pos
-            self.atom_pos += rotated_pos.tolist()
+        rotated_pos = np.dot(BB_H6_B.atom_pos, R_Matrix) + vertice_pos
+        self.atom_pos += rotated_pos.tolist()
 
-            self.atom_labels += ['C2' if i == 'C' else i for i in BB_H6_B.atom_labels]
+        self.atom_labels += ['C2' if i == 'C' else i for i in BB_H6_B.atom_labels]
 
         StartingFramework = Structure(
             self.cellMatrix,

@@ -18,8 +18,6 @@ src/pycofbuilder.egg-info/top_level.txt
 src/pycofbuilder/data/__init__.py
 src/pycofbuilder/data/periodic_table.json
 src/pycofbuilder/data/topology.py
-src/pycofbuilder/data/__pycache__/__init__.cpython-312.pyc
-src/pycofbuilder/data/__pycache__/topology.cpython-312.pyc
 src/pycofbuilder/data/conector/BOH2.cjson
 src/pycofbuilder/data/conector/Br.cjson
 src/pycofbuilder/data/conector/CCH3O.cjson
