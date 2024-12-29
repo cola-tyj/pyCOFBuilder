@@ -182,6 +182,7 @@ class BuildingBlock():
                 if self.atom_types[i] == 'X':
                     X_labels += [self.atom_types[i]]
                     X_pos += [self.atom_pos[i]]
+            # print(X_labels, np.array(X_pos))
 
             return X_labels, np.array(X_pos)
 

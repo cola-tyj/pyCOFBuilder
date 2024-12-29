@@ -32,7 +32,7 @@ TOPOLOGY_DICT = {
         'beta': 90,
         'gamma': 120,
         'vertice_connectivity': 3,
-        'edge_connectivity': 3,
+        'edge_connectivity': 2,
         'vertices': [
             {'position': [0, 0, 0], 'angle': 0},
             {'position': [0, np.sqrt(3)/3, 0], 'angle': 180}
@@ -95,6 +95,7 @@ TOPOLOGY_DICT = {
             {'position': [0.5, np.sqrt(3)/6, 0], 'angle': 0}
             ]
         },
+    '''因为hxl晶胞中只有一个原子，而本工具至少要有两个构建块，所以未实现生成HXL的代码'''
     'HXL': {
         'a': 2,
         'b': 2,
@@ -106,7 +107,7 @@ TOPOLOGY_DICT = {
         'edge_connectivity': 0,
         'vertices': [
             {'position': [0, 0, 0], 'angle': 30},
-            {'position': [1, 1/2, 0], 'angle': 30},
+            # {'position': [1/2, np.sqrt(3)/2, 0], 'angle': 30}
             ],
         'edges': []
     },
@@ -118,7 +119,7 @@ TOPOLOGY_DICT = {
         'beta': 90,
         'gamma': 120,
         'vertice_connectivity': 6,
-        'edge_connectivity': 0,
+        'edge_connectivity': 2,
         'vertices': [
             {'position': [0, 0, 0], 'angle': 30},
             ],
@@ -168,6 +169,7 @@ TOPOLOGY_DICT = {
             ]
         },
     'FXT': {
+        # 使用的 R4，夹角大小为 60度
         'a': 1,
         'b': 1,
         'c': 3.6,
@@ -175,7 +177,7 @@ TOPOLOGY_DICT = {
         'beta': 90,
         'gamma': 120,
         'vertice_connectivity': 4,
-        'edge_connectivity': 2,
+        'edge_connectivity': 0,
         'vertices': [
             {'position': [1/4, 3*np.sqrt(3)/12, 0], 'angle': -15},
             {'position': [0.5, 0, 0], 'angle': 45},
@@ -184,6 +186,7 @@ TOPOLOGY_DICT = {
         'edges': []
         },
     'FXT_A': {
+        # 用的是S4，正方形的
         'a': 2,
         'b': 2,
         'c': 3.6,
@@ -193,9 +196,12 @@ TOPOLOGY_DICT = {
         'vertice_connectivity': 4,
         'edge_connectivity': 2,
         'vertices': [
-            {'position': [1/4, 3*np.sqrt(3)/12, 0], 'angle': -15},
+            {'position': [1/4, np.sqrt(3)/4, 0], 'angle': -15},
             {'position': [0.5, 0, 0], 'angle': 45},
-            {'position': [-1/4, 3*np.sqrt(3)/12, 0], 'angle': 15}
+            {'position': [-1/4, np.sqrt(3)/4, 0], 'angle': 15}
+            # {'position': [1/4, np.sqrt(3)/4, 0], 'angle': -30},
+            # {'position': [0.5, 0, 0], 'angle': 30},
+            # {'position': [-1/4, np.sqrt(3)/4, 0], 'angle': 90}
             ],
         'edges': [
             {'position': [22/64, 7*np.sqrt(3)/64, 0], 'angle': -30},
@@ -204,6 +210,20 @@ TOPOLOGY_DICT = {
             {'position': [0, 29*np.sqrt(3)/128, 0], 'angle': 90},
             {'position': [21/128, 25*np.sqrt(3)/64, 0], 'angle': -30},
             {'position': [-21/128, 25*np.sqrt(3)/64, 0], 'angle': 30},
+            # 第二版本，改动了第二个点的横坐标
+            # {'position': [22/64, 7*np.sqrt(3)/64, 0], 'angle': -30},
+            # {'position': [84/128, 7*np.sqrt(3)/64, 0], 'angle': 30},
+            # {'position': [4/8, 35*np.sqrt(3)/128, 0], 'angle': 90},
+            # {'position': [0, 29*np.sqrt(3)/128, 0], 'angle': 90},
+            # {'position': [21/128, 25*np.sqrt(3)/64, 0], 'angle': -30},
+            # {'position': [-21/128, 25*np.sqrt(3)/64, 0], 'angle': 30},
+            # # 第三个版本，全部更改。
+            # {'position': [0, np.sqrt(3)/4, 0], 'angle': 90},
+            # {'position': [-1/8, 3*np.sqrt(3)/8, 0], 'angle': 30},
+            # {'position': [1/8, 3*np.sqrt(3)/8, 0], 'angle': -30},
+            # {'position': [3/8, np.sqrt(3)/8, 0], 'angle': -30},
+            # {'position': [5/8, np.sqrt(3)/8, 0], 'angle': 30},
+            # {'position': [1/2, np.sqrt(3)/4, 0], 'angle': 90},
             ]
         },
     'DIA': {
