@@ -352,6 +352,7 @@ TOPOLOGY_DICT = {
         'edges': [
             {'position': [0, np.sqrt(3)/3, 0], 'angle': 180}
         ]
+        
         },
         'HGB':{
             # 失败
