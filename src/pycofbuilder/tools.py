@@ -692,6 +692,16 @@ def get_bond_atom(connector_1: str, connector_2: str) -> str:
     for group in list(bond_dict.keys()):
         if group in [connector_1, connector_2]:
             bond_atom = bond_dict[group]
+    print('bond-atom is ', bond_atom)
+    # bond_atoms = []
+    # for group, atom in bond_dict.items():
+    #     if group == connector_1 or group == connector_2:
+    #         bond_atoms.append(atom)
+    # print('bond-atoms is ', bond_atoms)
+    # if len(bond_atoms) == 0:
+    #     raise ValueError(f"No valid bond atom found for connectors: {connector_1}, {connector_2}")
+    # if len(set(bond_atoms)) > 1:
+    #     raise ValueError(f"Ambiguous bond atoms for connectors: {connector_1}, {connector_2}")
 
     return bond_atom
 
@@ -706,6 +716,7 @@ def get_framework_symm_text(name, lattice, hall, space_group, space_number, symm
                                                                            space_group,
                                                                            space_number,
                                                                            symm_op)
+    print('symm-text is ', text)
     return text
 
 
@@ -1074,3 +1085,6 @@ def get_bonds(structure, cutoff=1.3):
     bonded_atoms = [[int(i[0]), int(i[1]), i[2]] for i in bonded_atoms]
 
     return bonded_atoms
+
+def my_print(str):
+    print(str)

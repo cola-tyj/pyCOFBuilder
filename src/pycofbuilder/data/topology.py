@@ -130,8 +130,8 @@ TOPOLOGY_DICT = {
             ]
         },
     'KGM': {
-        'a': 4,
-        'b': 4,
+        'a': 2,
+        'b': 2,
         'c': 3.6,
         'alpha': 90,
         'beta': 90,
@@ -139,9 +139,9 @@ TOPOLOGY_DICT = {
         'vertice_connectivity': 4,
         'edge_connectivity': 0,
         'vertices': [
-            {'position': [1/4, np.sqrt(3)/4, 0], 'angle': 30},
-            {'position': [1/2, 0, 0], 'angle': -90},
-            {'position': [-1/4, np.sqrt(3)/4, 0], 'angle': -30}
+            {'position': [1/4, np.sqrt(3)/4, 0], 'angle': -30},
+            {'position': [1/2, 0, 0], 'angle': 30},
+            {'position': [-1/4, np.sqrt(3)/4, 0], 'angle': 90}
             ],
         'edges': []
         },
@@ -155,9 +155,13 @@ TOPOLOGY_DICT = {
         'vertice_connectivity': 4,
         'edge_connectivity': 2,
         'vertices': [
-            {'position': [1/4, np.sqrt(3)/4, 0], 'angle': 30},
-            {'position': [1/2, 0, 0], 'angle': -90},
-            {'position': [-1/4, np.sqrt(3)/4, 0], 'angle': -30}
+            {'position': [1/4, np.sqrt(3)/4, 0], 'angle': -30},
+            {'position': [1/2, 0, 0], 'angle': 30},
+            {'position': [-1/4, np.sqrt(3)/4, 0], 'angle': 90}
+            # 原：
+            # {'position': [1/4, np.sqrt(3)/4, 0], 'angle': 30},
+            # {'position': [1/2, 0, 0], 'angle': -90},
+            # {'position': [-1/4, np.sqrt(3)/4, 0], 'angle': -30}
             ],
         'edges': [
             {'position': [3/8, np.sqrt(3)/8, 0], 'angle': -30},
@@ -169,7 +173,7 @@ TOPOLOGY_DICT = {
             ]
         },
     'FXT': {
-        # 使用的 R4，夹角大小为 60度
+        # 使用的 R4，夹角大小为 60度，错误，同样应该使用S4
         'a': 1,
         'b': 1,
         'c': 3.6,
@@ -284,5 +288,126 @@ TOPOLOGY_DICT = {
             {'position': [5/6, 1/6, 5/6], 'angle': 0, 'align_v': [1, 1/2, 1]},
             {'position': [5/6, 5/6, 1/6], 'angle': 10, 'align_v': [1, 1, 1]},
             ]
+        },
+        'HCA': {
+        'a': 2*np.cos(np.radians(30)),
+        'b': 2*np.cos(np.radians(30)),
+        'c': 3.6,
+        'alpha': 90,
+        'beta': 90,
+        'gamma': 120,
+        'vertice_connectivity': 3,
+        'edge_connectivity': 0,
+        'vertices': [
+            {'position': [0, 0, 0], 'angle': 0},
+            {'position': [0, np.sqrt(3)/3, 0], 'angle': 180}
+            ],
+        'edges': []
+        },
+        'HCA_A': {
+        'a': np.cos(np.radians(30))*10,
+        'b': np.cos(np.radians(30))*10,
+        'c': 3.6,
+        'alpha': 90,
+        'beta': 90,
+        'gamma': 120,
+        'vertice_connectivity': 3,
+        'edge_connectivity': 2,
+        'vertices': [
+            {'position': [1/2, np.sqrt(3)/12, 0], 'angle': 180},
+            {'position': [1/2 + 1/8, np.sqrt(3)/6 + np.sqrt(3)/24, 0], 'angle': 180},
+            {'position': [1/2 - 1/8, np.sqrt(3)/6 + np.sqrt(3)/24, 0], 'angle': 180},
+            {'position': [7/8, np.sqrt(3)/3 - np.sqrt(3)/24, 0], 'angle': 0},
+            {'position': [9/8, np.sqrt(3)/3 - np.sqrt(3)/24, 0], 'angle': 0},
+            {'position': [1, np.sqrt(3)/12 + np.sqrt(3)/3, 0], 'angle': 0}
+            ],
+        'edges': [
+            # {'position': [1/2 - np.sqrt(3)/32, np.sqrt(3)/6 - np.sqrt(3)/64, 0], 'angle': -30},
+            # {'position': [1/2 + np.sqrt(3)/32, np.sqrt(3)/6 - np.sqrt(3)/64, 0], 'angle': 30},
+            {'position': [1/2 - 1/8, np.sqrt(3)/6 - np.sqrt(3)/64, 0], 'angle': -30},
+            {'position': [1/2 + 1/8, np.sqrt(3)/6 - np.sqrt(3)/64, 0], 'angle': 30},
+            {'position': [1/2, np.sqrt(3)/16 + np.sqrt(3)/6, 0], 'angle': 90},
+            {'position': [3/4, np.sqrt(3)/4, 0], 'angle': 60},
+            {'position': [1, np.sqrt(3)/3 - np.sqrt(3)/16, 0], 'angle': 90},
+            # {'position': [1 - np.sqrt(3)/32, np.sqrt(3)/3 + np.sqrt(3)/64, 0], 'angle': 30},
+            # {'position': [1 + np.sqrt(3)/32, np.sqrt(3)/3 + np.sqrt(3)/64, 0], 'angle': -30},
+            {'position': [1 - 1/8, np.sqrt(3)/3 + np.sqrt(3)/64, 0], 'angle': 30},
+            {'position': [1 + 1/8, np.sqrt(3)/3 + np.sqrt(3)/64, 0], 'angle': -30},
+            {'position': [1/2, 0, 0], 'angle': 0},
+            {'position': [1/4, np.sqrt(3)/4, 0], 'angle': -60}
+        ]
+        },
+        'HNB': {
+        'a': 2*np.cos(np.radians(30)),
+        'b': 2*np.cos(np.radians(30)),
+        'c': 3.6,
+        'alpha': 90,
+        'beta': 90,
+        'gamma': 120,
+        'vertice_connectivity': 3,
+        'edge_connectivity': 3,
+        'vertices': [
+            {'position': [0, 0, 0], 'angle': 0}
+            ],
+        'edges': [
+            {'position': [0, np.sqrt(3)/3, 0], 'angle': 180}
+        ]
+        },
+        'HGB':{
+            # 失败
+            'a': 2*np.cos(np.radians(45)),
+            'b': 2*np.cos(np.radians(45))*2,
+            'c': 3.6,
+            'alpha': 90,
+            'beta': 90,
+            'gamma': 90,
+            'vertice_connectivity': 2,
+            'edge_connectivity': 0,
+            'vertices': [
+                {'position': [0, 0, 0], 'angle': -45},                
+                {'position': [1/2, 1/2, 0], 'angle': -45},
+                {'position': [0, 1, 0], 'angle': 45},                
+                {'position': [1/2, 3/2, 0], 'angle': 45}
+                ],
+            'edges': [ ]
+        },
+        'FESa':{
+            'a':2*np.cos(np.radians(30))*2,
+            'b':2*np.cos(np.radians(30))*2,
+            'c':3.6,
+            'alpha':90,
+            'beta':90,
+            'gamma':90,
+            'vertice_connectivity': 3,
+            'edge_connectivity': 2,
+            'vertices': [
+                {'position': [0, 0, 0], 'angle': 180},                
+                {'position': [0, 1/2, 0], 'angle': 0},
+                {'position': [1/4, 1/4, 0], 'angle': 60},                
+                {'position': [3/4, 1/4, 0], 'angle': -60}
+                ],
+            'edges': [ 
+                {'position': [1/8, 1/8, 0], 'angle': 45},                
+                {'position': [1/8, 3/8, 0], 'angle': -45},
+                {'position': [0, 3/4, 0], 'angle': 0},
+                {'position': [1/2, 1/4, 0],'angle': 90},
+                {'position': [7/8, 1/8, 0], 'angle': -45},                
+                {'position': [7/8, 3/8, 0], 'angle': 45}
+                ]
+            # T3_BENZ_CHO_CHO-L2_BENZ_NH2_NH2-FESa-AA
+            # 'vertices': [
+            #     {'position': [0, 0, 0], 'angle': 0},                
+            #     {'position': [0, 1/2, 0], 'angle': 180},
+            #     {'position': [1/4, 1/4, 0], 'angle': -90},                
+            #     {'position': [3/4, 1/4, 0], 'angle': 90}
+            #     ],
+            # 'edges': [ 
+            #     {'position': [1/8, 1/8, 0], 'angle': -15},                
+            #     {'position': [1/8, 3/8, 0], 'angle': -105},
+            #     {'position': [0, 3/4, 0], 'angle': -60},
+            #     {'position': [1/2, 1/4, 0],'angle': 30},
+            #     {'position': [7/8, 1/8, 0], 'angle': -105},                
+            #     {'position': [7/8, 3/8, 0], 'angle': -15}
+            #     ]
         }
     }

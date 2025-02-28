@@ -226,7 +226,7 @@ class BuildingBlock():
             for i in range(len(atom_types)):
                 if atom_types[i] == key:
                     R_dict[key] += [atom_pos[i]]
-
+        # print("R-dict is ", R_dict)
         return R_dict
 
     def calculate_size(self):
@@ -689,3 +689,4 @@ class BuildingBlock():
         files_list = os.listdir(self.bb_out_path)
 
         return [i.rstrip('.xyz') for i in files_list if shape == i.split('_')[0] and connector_group in i.split('_')[2]]
+    
